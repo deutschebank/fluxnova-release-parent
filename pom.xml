@@ -10,7 +10,7 @@
 
   <description>
     This pom defines the required plugins and profiles to allow a camunda release build.
-    Inherit this pom when you want to release your project into the camunda nexus and/or maven central.
+    Inherit this pom when you want to release your project into the Finos GitHub package registry.
   </description>
 
   <properties>
@@ -24,13 +24,6 @@
 
     <skip.camunda.release>false</skip.camunda.release>
     <skip.central.release>false</skip.central.release>
-    <nexus.snapshot.repository.id>github</nexus.snapshot.repository.id>
-    <nexus.snapshot.repository>https://maven.pkg.github.com/finos/flowave-release-parent</nexus.snapshot.repository>
-    <nexus.release.repository.id>github</nexus.release.repository.id>
-    <nexus.release.repository>https://maven.pkg.github.com/finos/flowave-release-parent</nexus.release.repository>
-
-    <nexus.staging.deploy.id>github</nexus.staging.deploy.id>
-    <nexus.staging.deploy.url>https://maven.pkg.github.com/finos/flowave-release-parent</nexus.staging.deploy.url>
     <gpg.useagent>true</gpg.useagent>
 
     <plugin.version.clean>3.1.0</plugin.version.clean>
@@ -50,7 +43,6 @@
     <plugin.version.rar>2.4</plugin.version.rar>
     <plugin.version.gpg>3.0.1</plugin.version.gpg>
     <plugin.version.release>2.5.3</plugin.version.release>
-    <plugin.version.nexus-staging>1.6.13</plugin.version.nexus-staging>
   </properties>
 
   <build>
@@ -164,11 +156,6 @@
           </configuration>
         </plugin>
         <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>${plugin.version.nexus-staging}</version>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>${plugin.version.source}</version>
@@ -191,30 +178,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <extensions>true</extensions>
-        <executions>
-          <execution>
-            <id>default-deploy</id>
-            <phase>deploy</phase>
-            <goals>
-              <goal>deploy</goal>
-            </goals>
-            <configuration>
-              <detectBuildFailures>true</detectBuildFailures>
-              <serverId>${nexus.staging.deploy.id}</serverId>
-              <nexusUrl>${nexus.staging.deploy.url}</nexusUrl>
-              <skipStaging>true</skipStaging>
-              <skipNexusStagingDeployMojo>${skip.camunda.release}</skipNexusStagingDeployMojo>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
   </build>
 
   <distributionManagement>
@@ -230,129 +193,12 @@
     </snapshotRepository>
   </distributionManagement>
 
-  <profiles>
-    <profile>
-      <id>override-snapshot-repository</id>
-      <activation>
-        <property>
-          <name>env.NEXUS_SNAPSHOT_REPOSITORY</name>
-        </property>
-      </activation>
-      <properties>
-        <nexus.snapshot.repository>${env.NEXUS_SNAPSHOT_REPOSITORY}</nexus.snapshot.repository>
-      </properties>
-    </profile>
-    <profile>
-      <id>override-snapshot-repository-id</id>
-      <activation>
-        <property>
-          <name>env.NEXUS_SNAPSHOT_REPOSITORY_ID</name>
-        </property>
-      </activation>
-      <properties>
-        <nexus.snapshot.repository.id>${env.NEXUS_SNAPSHOT_REPOSITORY_ID}</nexus.snapshot.repository.id>
-      </properties>
-    </profile>
-    <profile>
-      <id>override-release-repository</id>
-      <activation>
-        <property>
-          <name>env.NEXUS_RELEASE_REPOSITORY</name>
-        </property>
-      </activation>
-      <properties>
-        <nexus.release.repository>${env.NEXUS_RELEASE_REPOSITORY}</nexus.release.repository>
-      </properties>
-    </profile>
-    <profile>
-      <id>override-release-repository-id</id>
-      <activation>
-        <property>
-          <name>env.NEXUS_RELEASE_REPOSITORY_ID</name>
-        </property>
-      </activation>
-      <properties>
-        <nexus.release.repository.id>${env.NEXUS_RELEASE_REPOSITORY_ID}</nexus.release.repository.id>
-      </properties>
-    </profile>
-    <!-- activate this profile to release to maven central -->
-    <profile>
-      <id>sonatype-oss-release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>${plugin.version.source}</version>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>attach-test-sources</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>test-jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>${plugin.version.javadoc}</version>
-            <configuration>
-              <quiet>true</quiet>
-            </configuration>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>${plugin.version.gpg}</version>
-            <configuration>
-              <passphrase>${gpg.passphrase}</passphrase>
-            </configuration>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-
   <repositories>
     <repository>
       <id>github</id>
       <url>https://maven.pkg.github.com/finos/flowave-release-parent</url>
       <snapshots>
         <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>maven-central</id>
-      <name>Maven Central</name>
-      <url>https://repo1.maven.org/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
       </snapshots>
     </repository>
   </repositories>
