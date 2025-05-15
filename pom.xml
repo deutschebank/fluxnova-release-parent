@@ -4,7 +4,7 @@
 
   <groupId>org.camunda</groupId>
   <artifactId>camunda-release-parent</artifactId>
-  <version>3.7.2</version>
+  <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda - Release Parent Pom</name>
 
@@ -151,9 +151,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>${plugin.version.deploy}</version>
-          <configuration>
-            <skip>true</skip>
-          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
