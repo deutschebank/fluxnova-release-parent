@@ -16,8 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build and Deploy
+  build-and-deploy:
+    name: Build and/or Deploy
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -29,5 +29,10 @@ jobs:
       - name: Java setup
         uses: ./.github/actions/java-setup
 
-      - name: Deploy
+      - name: Build (mvn clean install)
+        if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')
+        run: mvn -B -e clean install
+
+      - name: Deploy (mvn clean deploy)
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
         run: mvn -B -e clean deploy
